@@ -1,0 +1,116 @@
+@page
+@model IndexModel
+@using JobPipeline.Models
+@{
+    ViewData["Title"] = "Applications";
+
+    string Badge(ApplicationStatus s) => s switch
+    {
+        ApplicationStatus.Wishlist => "bg-secondary-subtle text-secondary-emphasis",
+        ApplicationStatus.Applied => "bg-primary-subtle text-primary-emphasis",
+        ApplicationStatus.Screening or ApplicationStatus.Interview => "bg-info-subtle text-info-emphasis",
+        ApplicationStatus.Offer => "bg-success-subtle text-success-emphasis",
+        ApplicationStatus.Rejected => "bg-danger-subtle text-danger-emphasis",
+        _ => "bg-warning-subtle text-warning-emphasis",
+    };
+
+    string Meaning(ApplicationStatus s) => s switch
+    {
+        ApplicationStatus.Wishlist => "Found it, haven't applied yet",
+        ApplicationStatus.Applied => "Application sent, waiting for a reply",
+        ApplicationStatus.Screening => "In touch with a recruiter, first call or chat",
+        ApplicationStatus.Interview => "Technical or other interviews in progress",
+        ApplicationStatus.Offer => "Received an offer",
+        ApplicationStatus.Rejected => "The company said no",
+        ApplicationStatus.Withdrawn => "I pulled out of the process",
+        ApplicationStatus.Closed => "Position closed or no longer hiring",
+        _ => "",
+    };
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3 m-0">Applications <span class="text-muted fs-6">(@Model.Applications.Count)</span></h1>
+    <div class="d-flex gap-2">
+        <form method="get" class="d-flex gap-2">
+            <select name="status" class="form-select" onchange="this.form.submit()">
+                <option value="">All statuses</option>
+                @foreach (var s in Enum.GetValues<ApplicationStatus>())
+                {
+                    <option value="@s" selected="@(Model.Status == s)">@s</option>
+                }
+            </select>
+        </form>
+        <button type="button" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#legendModal">Legend</button>
+        <a class="btn btn-primary" asp-page="Edit">Add</a>
+    </div>
+</div>
+
+<div class="table-responsive bg-white border rounded">
+    <table class="table table-hover align-middle mb-0">
+        <thead>
+            <tr>
+                <th>Company</th><th>Title</th><th>Applied</th><th>Status</th>
+                <th>Next step</th><th>Salary</th><th>Notes</th><th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var a in Model.Applications)
+            {
+                <tr>
+                    <td class="fw-semibold">@a.Company</td>
+                    <td>
+                        @if (!string.IsNullOrEmpty(a.Url))
+                        {
+                            <a href="@a.Url" target="_blank" rel="noopener noreferrer">@a.Title</a>
+                        }
+                        else
+                        {
+                            @a.Title
+                        }
+                    </td>
+                    <td class="text-nowrap">@a.AppliedOn?.ToString("yyyy-MM-dd")</td>
+                    <td><span class="badge @Badge(a.Status)">@a.Status</span></td>
+                    <td>
+                        @a.NextStep
+                        @if (a.NextStepDate is { } d) { <div class="small text-muted">@d.ToString("yyyy-MM-dd")</div> }
+                    </td>
+                    <td>@a.SalaryText</td>
+                    <td class="notes small">@a.Notes</td>
+                    <td class="text-nowrap text-end">
+                        <a class="btn btn-sm btn-outline-secondary" asp-page="Edit" asp-route-id="@a.Id">Edit</a>
+                        <form method="post" asp-page-handler="Delete" asp-route-id="@a.Id" class="d-inline"
+                              onsubmit="return confirm('Delete @a.Company?');">
+                            <button class="btn btn-sm btn-outline-danger">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+            @if (Model.Applications.Count == 0)
+            {
+                <tr><td colspan="8" class="text-center text-muted py-4">Nothing here yet.</td></tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<div class="modal fade" id="legendModal" tabindex="-1" aria-labelledby="legendModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="width: fit-content; max-width: 90vw">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title fs-5" id="legendModalLabel">Status legend</h2>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <ul class="list-unstyled mb-0">
+                    @foreach (var s in Enum.GetValues<ApplicationStatus>())
+                    {
+                        <li class="d-flex align-items-center gap-2 mb-2">
+                            <span class="badge @Badge(s)" style="min-width: 5.5rem">@s</span>
+                            <span>@Meaning(s)</span>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>

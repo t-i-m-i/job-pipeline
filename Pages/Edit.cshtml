@@ -1,0 +1,64 @@
+@page "{id:int?}"
+@model EditModel
+@using JobPipeline.Models
+@{
+    ViewData["Title"] = Model.Application.Id == 0 ? "Add application" : "Edit application";
+}
+
+<h1 class="h3 mb-3">@ViewData["Title"]</h1>
+
+<form method="post" class="bg-white border rounded p-4" style="max-width: 48rem">
+    <input type="hidden" asp-for="Application.Id" />
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <div class="row g-3">
+        <div class="col-md-6">
+            <label asp-for="Application.Company" class="form-label"></label>
+            <input asp-for="Application.Company" class="form-control" autofocus />
+            <span asp-validation-for="Application.Company" class="text-danger"></span>
+        </div>
+        <div class="col-md-6">
+            <label asp-for="Application.Title" class="form-label"></label>
+            <input asp-for="Application.Title" class="form-control" />
+            <span asp-validation-for="Application.Title" class="text-danger"></span>
+        </div>
+        <div class="col-12">
+            <label asp-for="Application.Url" class="form-label"></label>
+            <input asp-for="Application.Url" class="form-control" placeholder="https://..." />
+            <span asp-validation-for="Application.Url" class="text-danger"></span>
+        </div>
+        <div class="col-md-6">
+            <label asp-for="Application.Status" class="form-label"></label>
+            <select asp-for="Application.Status" asp-items="Html.GetEnumSelectList<ApplicationStatus>()" class="form-select"></select>
+        </div>
+        <div class="col-md-6">
+            <label asp-for="Application.AppliedOn" class="form-label"></label>
+            <input asp-for="Application.AppliedOn" class="form-control" />
+        </div>
+        <div class="col-md-6">
+            <label asp-for="Application.NextStep" class="form-label"></label>
+            <input asp-for="Application.NextStep" class="form-control" />
+        </div>
+        <div class="col-md-6">
+            <label asp-for="Application.NextStepDate" class="form-label"></label>
+            <input asp-for="Application.NextStepDate" class="form-control" />
+        </div>
+        <div class="col-12">
+            <label asp-for="Application.SalaryText" class="form-label"></label>
+            <input asp-for="Application.SalaryText" class="form-control" placeholder="e.g. 14-16k PLN, 30 EUR/h" />
+        </div>
+        <div class="col-12">
+            <label asp-for="Application.Notes" class="form-label"></label>
+            <textarea asp-for="Application.Notes" class="form-control" rows="5"></textarea>
+        </div>
+    </div>
+
+    <div class="mt-4 d-flex gap-2">
+        <button class="btn btn-primary">Save</button>
+        <a class="btn btn-outline-secondary" asp-page="Index">Cancel</a>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
