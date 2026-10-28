@@ -9,6 +9,11 @@ Built with ASP.NET Core Razor Pages, EF Core and SQLite.
 > [!TIP]
 > This project is being developed with Claude Code as a way to learn ASP.NET Core for Node.js developers. [docs/architecture.md](docs/architecture.md) and the rest of the documentation map each ASP.NET feature to its Node counterpart, to help you build a mental model and learn faster.
 
+## Screens
+<img width="1720" height="984" alt="Image" src="https://github.com/user-attachments/assets/57c5be54-eaaf-4443-9ce8-bd1fbaa34f1f" />
+<img width="1712" height="975" alt="Image" src="https://github.com/user-attachments/assets/84159475-8f3a-4468-86e3-a969cf31b335" />
+<img width="1710" height="980" alt="Image" src="https://github.com/user-attachments/assets/34994b6f-6d0b-4b85-b3d4-520ade3bfcf9" />
+
 ## Requirements
 
 - [.NET SDK 10](https://dotnet.microsoft.com/download) (macOS: `brew install --cask dotnet-sdk`)
