@@ -3,6 +3,7 @@
 @using JobPipeline.Models
 @{
     ViewData["Title"] = "Applications";
+    var today = DateOnly.FromDateTime(DateTime.Today);
 
     string Badge(ApplicationStatus s) => s switch
     {
@@ -69,7 +70,13 @@
                         }
                     </td>
                     <td class="text-nowrap">@a.AppliedOn?.ToString("yyyy-MM-dd")</td>
-                    <td><span class="badge @Badge(a.Status)">@a.Status</span></td>
+                    <td class="text-nowrap">
+                        <span class="badge @Badge(a.Status)">@a.Status</span>
+                        @if (a.Status == ApplicationStatus.Applied && (a.AppliedOn is null || a.AppliedOn.Value.AddDays(14) < today))
+                        {
+                            <span title="Possibly ghosted" aria-label="Possibly ghosted">👻</span>
+                        }
+                    </td>
                     <td>
                         @a.NextStep
                         @if (a.NextStepDate is { } d) { <div class="small text-muted">@d.ToString("yyyy-MM-dd")</div> }
