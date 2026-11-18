@@ -1,0 +1,23 @@
+# EditorConfig is read by VS Code (C# Dev Kit), Visual Studio, Rider and `dotnet format`.
+# Closest Node equivalent: .prettierrc + .editorconfig in one file.
+root = true
+
+[*]
+charset = utf-8
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 4
+
+[*.{json,csproj}]
+indent_size = 2
+
+[*.md]
+trim_trailing_whitespace = false
+
+# Vendored Bootstrap/jQuery: leave untouched
+[wwwroot/lib/**]
+indent_style = unset
+indent_size = unset
+insert_final_newline = unset
+trim_trailing_whitespace = unset

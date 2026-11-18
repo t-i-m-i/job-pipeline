@@ -1,2 +1,6 @@
 body { background: #f8f9fa; }
 td.notes { max-width: 28rem; white-space: pre-line; }
+
+/* Search box: room for the "Clear" link on the right, hide the browser's own clear (x) button */
+.search-with-clear { padding-right: 4.5rem; }
+.search-with-clear::-webkit-search-cancel-button { display: none; }

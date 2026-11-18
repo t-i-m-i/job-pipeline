@@ -33,13 +33,21 @@
     <h1 class="h3 m-0">Applications <span class="text-muted fs-6">(@Model.Applications.Count)</span></h1>
     <div class="d-flex gap-2">
         <form method="get" class="d-flex gap-2">
-            <select name="status" class="form-select" onchange="this.form.submit()">
+            <div class="position-relative flex-shrink-0" style="width: 22rem; max-width: 90vw">
+                <input type="search" name="searchquery" value="@Model.SearchQuery" class="form-control search-with-clear" placeholder="Company or title" />
+                @if (!string.IsNullOrWhiteSpace(Model.SearchQuery))
+                {
+                    <a class="btn btn-link position-absolute top-0 end-0" asp-page="Index" asp-route-status="@Model.Status">Clear</a>
+                }
+            </div>
+            <select name="status" class="form-select w-auto" onchange="this.form.submit()">
                 <option value="">All statuses</option>
                 @foreach (var s in Enum.GetValues<ApplicationStatus>())
                 {
                     <option value="@s" selected="@(Model.Status == s)">@s</option>
                 }
             </select>
+            <button class="btn btn-outline-secondary">Search</button>
         </form>
         <button type="button" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#legendModal">Legend</button>
         <a class="btn btn-primary" asp-page="Edit">Add</a>
