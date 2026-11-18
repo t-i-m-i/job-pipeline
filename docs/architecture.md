@@ -206,14 +206,53 @@ var list = await query.ToListAsync();                           // executes here
 
 ### Migrations
 
-Migrations are generated from the difference between your C# model and the last snapshot, like `prisma migrate dev`
-or `typeorm migration:generate`:
+A migration is a version-controlled file that changes the database schema, applied in order by a tool that
+remembers which ones already ran. If you have used hand-written SQL migrations (for example `node-pg-migrate` with
+`-- Up` / `-- Down` sections), the bookkeeping is the same. The difference is who writes the file:
 
-```sh
-dotnet ef migrations add AddSomething     # writes files into Migrations/
+- **Hand-written SQL migrations:** you decide the change and write the `ALTER TABLE ...` yourself.
+- **EF Core (and Prisma, TypeORM):** the C# model is the source of truth. You edit the class, and the tool diffs it
+  against the previous state and generates the migration.
+
+```csharp
+public string? Phone { get; set; }        // 1. add a property to Models/JobApplication.cs
 ```
 
-The app applies them at startup with `Database.Migrate()`. Commit the `Migrations/` folder.
+```sh
+dotnet ef migrations add AddPhone         # 2. writes files into Migrations/
+```
+
+```csharp
+// 3. generated Migrations/<timestamp>_AddPhone.cs (review it, don't blindly trust it)
+protected override void Up(MigrationBuilder mb) =>
+    mb.AddColumn<string>(name: "Phone", table: "Applications", type: "TEXT", nullable: true);
+protected override void Down(MigrationBuilder mb) =>
+    mb.DropColumn(name: "Phone", table: "Applications");
+```
+
+The generated `Up`/`Down` use C# builder methods (`AddColumn`) instead of SQL; EF translates them to SQL for the
+configured database. The app applies pending migrations at startup with `Database.Migrate()` and records them in the
+`__EFMigrationsHistory` table (like `pgmigrations` in `node-pg-migrate`). Commit the `Migrations/` folder, and as with
+SQL migrations, never edit one that has already run: add a new one.
+
+`Migrations/AppDbContextModelSnapshot.cs` is the "previous state" EF diffs against. It is a C# copy of the model as of
+the last migration, so generating a migration needs no database connection. Don't edit it by hand.
+
+How the Node tools compare:
+
+| | Hand-written SQL | EF Core | Prisma | TypeORM |
+|---|---|---|---|---|
+| Source of truth | the SQL files | C# model classes | `schema.prisma` | entity classes |
+| Generate command | write it yourself | `dotnet ef migrations add` | `prisma migrate dev` | `typeorm migration:generate` |
+| Diffs the model against | n/a | `ModelSnapshot.cs` in the repo | replayed migrations (shadow DB) | the live database |
+| Migration language | SQL | C# builder API | SQL | TypeScript wrapping raw SQL |
+| `down` | yes | yes (`dotnet ef migrations remove` / `database update <Previous>`) | no, only forward | yes |
+| History table | `pgmigrations` | `__EFMigrationsHistory` | `_prisma_migrations` | `migrations` |
+
+Generated does not mean safe. Adding a `NOT NULL` column to a table that already has rows fails unless it has a
+default, and a renamed property is usually generated as drop column + add column, which loses the data. Read every
+generated migration before committing it.
+
 `dotnet-ef` is a global CLI tool (installed once with `dotnet tool install -g dotnet-ef`), unlike NuGet packages that live in the project.
 
 ## Configuration
