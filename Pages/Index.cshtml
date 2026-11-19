@@ -30,15 +30,17 @@
 }
 
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h1 class="h3 m-0">Applications <span class="text-muted fs-6">(@Model.Applications.Count)</span></h1>
+    <h1 class="h3 m-0">Applications <span id="applications-count" class="text-muted fs-6">(@Model.Applications.Count)</span></h1>
     <div class="d-flex gap-2">
-        <form method="get" class="d-flex gap-2">
+        <form id="filter-form" method="get" class="d-flex gap-2">
             <div class="position-relative flex-shrink-0" style="width: 22rem; max-width: 90vw">
                 <input type="search" name="searchquery" value="@Model.SearchQuery" class="form-control search-with-clear" placeholder="Company or title" />
-                @if (!string.IsNullOrWhiteSpace(Model.SearchQuery))
-                {
-                    <a class="btn btn-link position-absolute top-0 end-0" asp-page="Index" asp-route-status="@Model.Status">Clear</a>
-                }
+                <span id="search-clear">
+                    @if (!string.IsNullOrWhiteSpace(Model.SearchQuery))
+                    {
+                        <a class="btn btn-link position-absolute top-0 end-0" asp-page="Index" asp-route-status="@Model.Status">Clear</a>
+                    }
+                </span>
             </div>
             <select name="status" class="form-select w-auto" onchange="this.form.submit()">
                 <option value="">All statuses</option>
@@ -54,7 +56,7 @@
     </div>
 </div>
 
-<div class="table-responsive bg-white border rounded">
+<div id="applications-table" class="table-responsive bg-white border rounded">
     <table class="table table-hover align-middle mb-0">
         <thead>
             <tr>
@@ -129,3 +131,7 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script src="~/js/index.js" asp-append-version="true"></script>
+}
